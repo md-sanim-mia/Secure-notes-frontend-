@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Secure Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f5;--ink:#1b2430;--mute:#5d6b7c;--line:#d3dae3;--card:#fff;--acc:#0f766e;--bad:#b42318}
+@media(prefers-color-scheme:dark){:root{--bg:#10151c;--ink:#e6ebf2;--mute:#97a4b5;--line:#2a3441;--card:#18202a;--acc:#2dd4bf;--bad:#f97066}}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+h1{font-size:22px;margin:0}h2{font-size:17px;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px;margin-bottom:14px}
+nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+nav button{background:none;border:1px solid var(--line);color:var(--ink)}
+nav button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+input,textarea,select{width:100%;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px;margin-bottom:8px}
+textarea{min-height:70px;resize:vertical}
+button{font:inherit;cursor:pointer;border:0;border-radius:4px;padding:7px 13px;background:var(--acc);color:#fff}
+button.ghost{background:none;border:1px solid var(--line);color:var(--ink);padding:3px 10px;font-size:13px}
+button.danger{border-color:var(--bad);color:var(--bad)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+.item{border-top:1px solid var(--line);padding:10px 0}
+.item:first-child{border-top:0}
+.item p{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.acts{display:flex;gap:6px;margin-top:6px}
+.mute{color:var(--mute);font-size:13px;overflow-wrap:anywhere}
+[hidden]{display:none!important}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:4px;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}#toast.bad{background:var(--bad);color:#fff}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<header><h1>Secure Notes</h1><div><span id="who" class="mute"></span> <button id="logout" class="ghost" hidden>Log out</button></div></header>
+
+<!-- signed out -->
+<section id="authView" class="card">
+  <nav><button id="tabLogin" class="on" type="button">Log in</button><button id="tabRegister" type="button">Register</button></nav>
+  <form id="loginForm">
+    <input name="email" type="email" placeholder="Email" required autocomplete="username">
+    <input name="password" type="password" placeholder="Password" required autocomplete="current-password">
+    <button>Log in</button>
+  </form>
+  <form id="registerForm" hidden>
+    <input name="name" placeholder="Name" required>
+    <input name="email" type="email" placeholder="Email" required autocomplete="username">
+    <input name="password" type="password" placeholder="Password (8-72 characters)" minlength="8" maxlength="72" required autocomplete="new-password">
+    <input name="interests" placeholder="Interests, comma separated (optional)">
+    <button>Create account</button>
+  </form>
+</section>
+
+<!-- signed in -->
+<div id="appView" hidden>
+  <nav id="tabs">
+    <button data-tab="notes" type="button">Notes</button>
+    <button data-tab="posts" type="button">Posts</button>
+    <button data-tab="users" type="button" class="admin">Users</button>
+    <button data-tab="interests" type="button" class="admin">Interests</button>
+    <button data-tab="profile" type="button">Profile</button>
+  </nav>
+
+  <section id="tab-notes" hidden>
+    <form id="noteForm" class="card">
+      <h2>New note</h2>
+      <input name="title" placeholder="Title" required maxlength="200">
+      <textarea name="content" placeholder="Write something"></textarea>
+      <button>Save note</button>
+    </form>
+    <div class="card">
+      <h2 id="notesTitle">My notes</h2>
+      <input id="noteOwner" class="admin" placeholder="Filter by owner user id (press Enter)">
+      <div id="notesList"></div><button id="notesMore" class="ghost" hidden>Load more</button>
+    </div>
+    <div class="card"><h2>Open one note</h2>
+      <input id="noteById" placeholder="Note id (press Enter)"><div id="noteOne"></div>
+    </div>
+  </section>
+
+  <section id="tab-posts" hidden>
+    <form id="postForm" class="card">
+      <h2>New post</h2>
+      <input name="title" placeholder="Title" required maxlength="200">
+      <textarea name="content" placeholder="Public content"></textarea>
+      <button>Publish post</button>
+    </form>
+    <div class="card">
+      <h2>Posts</h2>
+      <div class="row">
+        <select id="postMode"><option value="all">All posts</option><option value="user">Posts of one user</option></select>
+        <input id="postUser" placeholder="User id (press Enter)" hidden>
+      </div>
+      <div id="postsList"></div><button id="postsMore" class="ghost" hidden>Load more</button>
+    </div>
+    <div class="card"><h2>Open one post</h2>
+      <input id="postById" placeholder="Post id (press Enter)"><div id="postOne"></div>
+    </div>
+  </section>
+
+  <section id="tab-users" class="admin" hidden>
+    <form id="userForm" class="card">
+      <h2>Add user</h2>
+      <div class="row"><input name="name" placeholder="Name" required><input name="email" type="email" placeholder="Email" required></div>
+      <div class="row"><input name="password" type="password" placeholder="Password" minlength="8" maxlength="72" required autocomplete="new-password">
+        <select name="role"><option value="user">user</option><option value="admin">admin</option></select></div>
+      <input name="interests" placeholder="Interests, comma separated">
+      <button>Add user</button>
+    </form>
+    <div class="card"><h2>All users</h2><div id="usersList"></div><button id="usersMore" class="ghost" hidden>Load more</button></div>
+    <div class="card"><h2>Open one user</h2>
+      <input id="userById" placeholder="User id (press Enter)"><div id="userOne"></div>
+    </div>
+  </section>
+
+  <section id="tab-interests" class="admin" hidden>
+    <div class="card">
+      <h2>Users grouped by interest</h2>
+      <input id="interestFilter" placeholder="Show one interest only, e.g. chess (press Enter)">
+      <div id="interestsList"></div><button id="interestsMore" class="ghost" hidden>Load more</button>
+    </div>
+  </section>
+
+  <section id="tab-profile" hidden>
+    <div class="card"><h2>My profile</h2><p id="profileInfo" class="mute"></p>
+      <form id="profileForm"><input name="name" placeholder="Name"><input name="interests" placeholder="Interests, comma separated"><button>Update profile</button></form>
+    </div>
+    <form id="pwForm" class="card"><h2>Change password</h2>
+      <input name="oldPassword" type="password" placeholder="Current password" required autocomplete="current-password">
+      <input name="newPassword" type="password" placeholder="New password (8-72 characters)" minlength="8" maxlength="72" required autocomplete="new-password">
+      <button>Change password</button>
+    </form>
+  </section>
+</div>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+// Backend address. Change it if your API runs somewhere else.
+const API = "http://localhost:6001/api/v1";
+
+const $ = (id) => document.getElementById(id);
+const h = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
+const csv = (s) => (s || "").split(",").map((x) => x.trim()).filter(Boolean);
+let token = localStorage.getItem("token");
+let me = JSON.parse(localStorage.getItem("me") || "null");
+
+function toast(msg, bad) {
+  const t = $("toast"); t.textContent = msg; t.className = "show" + (bad ? " bad" : "");
+  clearTimeout(toast.t); toast.t = setTimeout(() => (t.className = ""), 3500);
+}
+const guard = (fn) => async (...a) => {
+  try { await fn(...a); }
+  catch (e) { toast(e.message === "Failed to fetch" ? "Cannot reach the API. Start the server and set CLIENT_URLS to this page's address." : e.message, true); }
+};
+async function api(method, path, body) {
+  const res = await fetch(API + path, {
+    method,
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: "Bearer " + token } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    if (res.status === 401 && token && !path.startsWith("/auth/login")) logout();
+    const d = (j.errorSources || []).map((e) => e.path + ": " + e.message).join("; ");
+    throw new Error((j.message || "Request failed") + (d ? " (" + d + ")" : ""));
+  }
+  return j;
+}
+
+// ---- session ----
+function setSession(t, user) {
+  token = t; if (user) me = user;
+  localStorage.setItem("token", token); localStorage.setItem("me", JSON.stringify(me));
+  render();
+}
+function logout() { token = me = null; localStorage.clear(); render(); }
+function render() {
+  const on = !!token && !!me;
+  $("authView").hidden = on; $("appView").hidden = !on; $("logout").hidden = !on;
+  $("who").textContent = on ? me.name + " (" + me.role + ")" : "";
+  document.querySelectorAll(".admin").forEach((el) => { if (el.tagName !== "SECTION") el.hidden = !(on && me.role === "admin"); });
+  $("notesTitle").textContent = on && me.role === "admin" ? "All notes" : "My notes";
+  if (on) show("notes");
+}
+$("logout").onclick = logout;
+$("tabLogin").onclick = () => { $("loginForm").hidden = false; $("registerForm").hidden = true; $("tabLogin").className = "on"; $("tabRegister").className = ""; };
+$("tabRegister").onclick = () => { $("loginForm").hidden = true; $("registerForm").hidden = false; $("tabLogin").className = ""; $("tabRegister").className = "on"; };
+
+const onForm = (id, fn) => { $(id).onsubmit = guard(async (e) => { e.preventDefault(); await fn(Object.fromEntries(new FormData(e.target))); }); };
+const btn = (label, fn, cls) => h("button", { textContent: label, className: "ghost " + (cls || ""), onclick: guard(fn) });
+const item = (title, meta, text, acts = []) =>
+  h("div", { className: "item" }, h("b", { textContent: title }), h("div", { className: "mute", textContent: meta }),
+    ...(text ? [h("p", { textContent: text })] : []), h("div", { className: "acts" }, ...acts));
+
+// keyset pagination: pass ?cursor=<meta.nextCursor> to get the next page
+function pager(list, more, url, items, row) {
+  let cursor = null;
+  const load = guard(async (reset) => {
+    if (reset) { cursor = null; list.replaceChildren(); }
+    const u = url();
+    const r = await api("GET", u + (u.includes("?") ? "&" : "?") + "limit=5" + (cursor ? "&cursor=" + encodeURIComponent(cursor) : ""));
+    const rows = items(r);
+    if (!rows.length && !cursor) list.append(h("p", { className: "mute", textContent: "Nothing here yet." }));
+    rows.forEach((x) => list.append(row(x)));
+    cursor = r.meta.nextCursor; more.hidden = !r.meta.hasMore;
+  });
+  more.onclick = () => load(false);
+  return { reset: () => load(true) };
+}
+const onEnter = (id, fn) => { $(id).onkeydown = (e) => { if (e.key === "Enter") fn(); }; };
+
+// ---- auth ----
+onForm("loginForm", async (f) => { const r = await api("POST", "/auth/login", f); setSession(r.data.accessToken, r.data.user); });
+onForm("registerForm", async (f) => { f.interests = csv(f.interests); const r = await api("POST", "/auth/register", f); setSession(r.data.accessToken, r.data.user); });
+
+// ---- notes ----
+const notes = pager($("notesList"), $("notesMore"),
+  () => "/notes" + ($("noteOwner").value.trim() ? "?owner=" + encodeURIComponent($("noteOwner").value.trim()) : ""),
+  (r) => r.data,
+  (n) => {
+    const owner = n.owner && n.owner._id ? n.owner : { _id: n.owner };
+    const acts = owner._id === me._id ? [
+      btn("Edit", async () => {
+        const title = prompt("Title", n.title); if (title === null) return;
+        const content = prompt("Content", n.content); if (content === null) return;
+        await api("PATCH", "/notes/" + n._id, { title, content }); toast("Note saved"); notes.reset();
+      }),
+      btn("Delete", async () => { if (confirm("Delete this note?")) { await api("DELETE", "/notes/" + n._id); toast("Note deleted"); notes.reset(); } }, "danger"),
+    ] : [];
+    return item(n.title, (owner.name ? "by " + owner.name + " · " : "") + new Date(n.createdAt).toLocaleString(), n.content, acts);
+  });
+onForm("noteForm", async (f) => { await api("POST", "/notes", f); $("noteForm").reset(); toast("Note saved"); notes.reset(); });
+onEnter("noteOwner", () => notes.reset());
+
+// ---- posts ----
+const posts = pager($("postsList"), $("postsMore"),
+  () => ($("postMode").value === "user" ? "/posts/user/" + encodeURIComponent($("postUser").value.trim()) : "/posts"),
+  (r) => (Array.isArray(r.data) ? r.data : r.data.posts),
+  (p) => item(p.title, new Date(p.createdAt).toLocaleString() + " · author " + p.author, p.content,
+    p.author === me._id ? [
+      btn("Edit", async () => {
+        const title = prompt("Title", p.title); if (title === null) return;
+        const content = prompt("Content", p.content); if (content === null) return;
+        await api("PATCH", "/posts/" + p._id, { title, content }); toast("Post saved"); posts.reset();
+      }),
+      btn("Delete", async () => { if (confirm("Delete this post?")) { await api("DELETE", "/posts/" + p._id); toast("Post deleted"); posts.reset(); } }, "danger"),
+    ] : []));
+onForm("postForm", async (f) => { await api("POST", "/posts", f); $("postForm").reset(); toast("Post published"); posts.reset(); });
+$("postMode").onchange = () => { const u = $("postMode").value === "user"; $("postUser").hidden = !u; if (!u) posts.reset(); };
+onEnter("postUser", () => posts.reset());
+
+// ---- users (admin) ----
+const users = pager($("usersList"), $("usersMore"), () => "/users", (r) => r.data,
+  (u) => item(u.name, u.email + " · " + u.role + " · [" + (u.interests || []).join(", ") + "] · id " + u._id, "", [
+    btn("Edit", async () => {
+      const name = prompt("Name", u.name); if (name === null) return;
+      const role = prompt("Role (user or admin)", u.role); if (role === null) return;
+      const interests = prompt("Interests, comma separated", (u.interests || []).join(", ")); if (interests === null) return;
+      await api("PATCH", "/users/" + u._id, { name, role, interests: csv(interests) }); toast("User saved"); users.reset();
+    }),
+    btn("Delete", async () => { if (confirm("Delete this user and all their notes and posts?")) { await api("DELETE", "/users/" + u._id); toast("User deleted"); users.reset(); } }, "danger"),
+  ]));
+onForm("userForm", async (f) => { f.interests = csv(f.interests); await api("POST", "/users", f); $("userForm").reset(); toast("User added"); users.reset(); });
+
+// ---- interests (admin) ----
+const interests = pager($("interestsList"), $("interestsMore"),
+  () => "/users/interests" + ($("interestFilter").value.trim() ? "?interest=" + encodeURIComponent($("interestFilter").value.trim()) : ""),
+  (r) => r.data,
+  (g) => item(g.interest + " (" + g.count + ")", "", g.users.map((u) => u.name + " <" + u.email + ">").join(", ")));
+onEnter("interestFilter", () => interests.reset());
+
+// ---- open one item by id (GET /notes/:id, /posts/:id, /users/:id) ----
+const one = (inputId, outId, path, fmt) => onEnter(inputId, guard(async () => {
+  const r = await api("GET", path + encodeURIComponent($(inputId).value.trim()));
+  $(outId).replaceChildren(fmt(r.data));
+}));
+one("noteById", "noteOne", "/notes/", (n) => item(n.title, new Date(n.createdAt).toLocaleString() + " · owner " + n.owner, n.content));
+one("postById", "postOne", "/posts/", (p) => item(p.title, new Date(p.createdAt).toLocaleString() + " · author " + p.author, p.content));
+one("userById", "userOne", "/users/", (u) => item(u.name, u.email + " · " + u.role + " · [" + (u.interests || []).join(", ") + "]", ""));
+
+// ---- profile ----
+const loadProfile = guard(async () => {
+  const r = (await api("GET", "/users/me")).data;
+  $("profileInfo").textContent = r.email + " · " + r.role + " · interests: " + (r.interests || []).join(", ");
+  $("profileForm").elements.name.value = r.name; $("profileForm").elements.interests.value = (r.interests || []).join(", ");
+});
+onForm("profileForm", async (f) => {
+  const r = await api("PATCH", "/users/me", { name: f.name, interests: csv(f.interests) });
+  me.name = r.data.name; localStorage.setItem("me", JSON.stringify(me)); $("who").textContent = me.name + " (" + me.role + ")";
+  toast("Profile saved"); loadProfile();
+});
+onForm("pwForm", async (f) => { const r = await api("PATCH", "/auth/change-password", f); setSession(r.data.accessToken); $("pwForm").reset(); toast("Password changed"); });
+
+// ---- tabs ----
+const loaders = { notes: () => notes.reset(), posts: () => posts.reset(), users: () => users.reset(), interests: () => interests.reset(), profile: loadProfile };
+function show(name) {
+  document.querySelectorAll("#tabs button").forEach((b) => b.classList.toggle("on", b.dataset.tab === name));
+  ["notes", "posts", "users", "interests", "profile"].forEach((t) => ($("tab-" + t).hidden = t !== name));
+  loaders[name]();
+}
+document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => show(b.dataset.tab)));
+
+render();
+</script>
+</body>
+</html>
