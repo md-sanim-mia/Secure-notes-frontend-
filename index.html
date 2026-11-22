@@ -3,311 +3,307 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f766e">
 <title>Secure Notes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#eef1f5;--ink:#1b2430;--mute:#5d6b7c;--line:#d3dae3;--card:#fff;--acc:#0f766e;--bad:#b42318}
-@media(prefers-color-scheme:dark){:root{--bg:#10151c;--ink:#e6ebf2;--mute:#97a4b5;--line:#2a3441;--card:#18202a;--acc:#2dd4bf;--bad:#f97066}}
+:root{--bg:#eef3fa;--card:#fff;--ink:#14202e;--mute:#5f6f84;--line:#dde5ef;--a:#0f766e;--b:#2563eb;--soft:#e4f3f1;--bad:#c0291f;--ok:#16794a;--g:linear-gradient(135deg,#0f766e,#2563eb);--sh:0 1px 2px rgba(20,32,46,.06),0 6px 18px rgba(20,32,46,.06)}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1017;--card:#151d28;--ink:#e8eef6;--mute:#94a3b8;--line:#263241;--a:#2dd4bf;--b:#60a5fa;--soft:#13333a;--bad:#f97066;--ok:#4ade80;--g:linear-gradient(135deg,#0d9488,#2563eb);--sh:none}}
 *{box-sizing:border-box}
-body{margin:0;font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
-main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-h1{font-size:22px;margin:0}h2{font-size:17px;margin:0 0 10px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px;margin-bottom:14px}
-nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
-nav button{background:none;border:1px solid var(--line);color:var(--ink)}
-nav button.on{background:var(--acc);border-color:var(--acc);color:#fff}
-input,textarea,select{width:100%;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px;margin-bottom:8px}
-textarea{min-height:70px;resize:vertical}
-button{font:inherit;cursor:pointer;border:0;border-radius:4px;padding:7px 13px;background:var(--acc);color:#fff}
-button.ghost{background:none;border:1px solid var(--line);color:var(--ink);padding:3px 10px;font-size:13px}
-button.danger{border-color:var(--bad);color:var(--bad)}
-button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
-.item{border-top:1px solid var(--line);padding:10px 0}
-.item:first-child{border-top:0}
-.item p{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}
-.acts{display:flex;gap:6px;margin-top:6px}
-.mute{color:var(--mute);font-size:13px;overflow-wrap:anywhere}
+body{margin:0;font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
 [hidden]{display:none!important}
-#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:4px;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .2s}
-#toast.show{opacity:1}#toast.bad{background:var(--bad);color:#fff}
+body:not([data-role="admin"]) .admin-only{display:none!important}
+h1,h2{margin:0;line-height:1.25}h2{font-size:1.08rem;margin-bottom:.7rem}
+.wrap{max-width:840px;margin:0 auto;padding:0 14px 40px}
+.top{background:var(--g);color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.top-in{max-width:840px;margin:0 auto;padding:10px 14px 6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font-weight:700;font-size:1.1rem;display:flex;align-items:center;gap:8px}
+.logo i{width:26px;height:26px;border-radius:8px;background:#fff3;border:2px solid #fff;display:inline-block}
+.grow{flex:1}.who{font-size:.85rem;opacity:.92}
+.top .btn{background:#fff2;border-color:#fff8}
+nav.tabs{display:flex;gap:4px;width:100%;overflow-x:auto;padding-bottom:6px}
+nav.tabs button{background:none;border:0;color:#fffd;padding:7px 14px;border-radius:99px;font:inherit;cursor:pointer;white-space:nowrap}
+nav.tabs button.on{background:#fff;color:#0f5f58;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--a);border-radius:12px;padding:16px;margin-top:14px;box-shadow:var(--sh)}
+.card.c2{border-top-color:var(--b)}.card.c3{border-top-color:#d9488f}.card.c4{border-top-color:#e08a00}
+.stack{display:grid;gap:10px}
+label{display:grid;gap:4px;font-size:.8rem;color:var(--mute);font-weight:600}
+input,textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+textarea{min-height:90px;resize:vertical}
+:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid transparent;background:var(--g);color:#fff;border-radius:8px;padding:9px 16px;font-weight:600}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.ghost{background:transparent;color:var(--a);border-color:var(--a)}
+.btn.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
+.btn.sm{padding:3px 12px;font-size:.82rem;font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:150px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.bar input,.bar select{flex:1;min-width:140px;width:auto}
+.item{display:flex;gap:12px;padding:13px 0;border-top:1px solid var(--line)}
+.item:first-child{border-top:0;padding-top:2px}
+.ib{min-width:0;flex:1}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;flex:none;background:hsl(var(--h) 60% 45%)}
+.t{font-weight:600;overflow-wrap:anywhere}
+.m{color:var(--mute);font-size:.8rem;overflow-wrap:anywhere}
+.b{margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{display:inline-block;border-radius:99px;padding:1px 11px;font-size:.78rem;margin:3px 4px 0 0;background:hsl(var(--h) 70% 50%/.15);color:hsl(var(--h) 65% 36%)}
+@media(prefers-color-scheme:dark){.chip{color:hsl(var(--h) 80% 74%)}}
+.badge{font-size:.7rem;border-radius:99px;padding:1px 9px;margin-left:8px;vertical-align:middle;color:#fff;background:#64748b}
+.badge.admin{background:#d9488f}.badge.user{background:var(--a)}
+.mute{color:var(--mute)}.small{font-size:.85rem}
+.linkbtn{background:none;border:0;padding:0;color:var(--b);text-decoration:underline;font:inherit;font-size:.8rem}
+.empty{text-align:center;color:var(--mute);padding:18px 0}
+.more{display:block;margin:12px auto 0}
+details>summary{cursor:pointer;font-weight:600;color:var(--a)}
+details[open]>summary{margin-bottom:10px}
+.auth{min-height:100vh;display:grid;place-items:center;padding:16px;background:var(--g)}
+.auth .card{width:100%;max-width:390px;margin:0;border-top:0}
+.auth h1{text-align:center;margin-bottom:14px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.seg button{flex:1;border:0;background:none;color:var(--mute);padding:9px;font-weight:600}
+.seg button.on{background:var(--g);color:#fff}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);width:min(480px,94vw);padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+dialog::backdrop{background:rgba(8,12,18,.6)}
+.dlg-actions{display:flex;gap:8px;justify-content:flex-end}
+#dbg summary.ok::before{content:"● ";color:var(--ok)}#dbg summary.bad::before{content:"● ";color:var(--bad)}
+#dbg pre{margin:0;max-height:260px;overflow:auto;font-size:.76rem;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,10px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;max-width:92vw;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+#toast.show{opacity:1;transform:translate(-50%,0)}#toast.bad{background:var(--bad);color:#fff}#toast.ok{background:var(--ok);color:#fff}
 @media(prefers-reduced-motion:reduce){#toast{transition:none}}
 </style>
 </head>
 <body>
-<main>
-<header><h1>Secure Notes</h1><div><span id="who" class="mute"></span> <button id="logout" class="ghost" hidden>Log out</button></div></header>
 
-<!-- signed out -->
-<section id="authView" class="card">
-  <nav><button id="tabLogin" class="on" type="button">Log in</button><button id="tabRegister" type="button">Register</button></nav>
-  <form id="loginForm">
-    <input name="email" type="email" placeholder="Email" required autocomplete="username">
-    <input name="password" type="password" placeholder="Password" required autocomplete="current-password">
-    <button>Log in</button>
-  </form>
-  <form id="registerForm" hidden>
-    <input name="name" placeholder="Name" required>
-    <input name="email" type="email" placeholder="Email" required autocomplete="username">
-    <input name="password" type="password" placeholder="Password (8-72 characters)" minlength="8" maxlength="72" required autocomplete="new-password">
-    <input name="interests" placeholder="Interests, comma separated (optional)">
-    <button>Create account</button>
-  </form>
-</section>
-
-<!-- signed in -->
-<div id="appView" hidden>
-  <nav id="tabs">
-    <button data-tab="notes" type="button">Notes</button>
-    <button data-tab="posts" type="button">Posts</button>
-    <button data-tab="users" type="button" class="admin">Users</button>
-    <button data-tab="interests" type="button" class="admin">Interests</button>
-    <button data-tab="profile" type="button">Profile</button>
-  </nav>
-
-  <section id="tab-notes" hidden>
-    <form id="noteForm" class="card">
-      <h2>New note</h2>
-      <input name="title" placeholder="Title" required maxlength="200">
-      <textarea name="content" placeholder="Write something"></textarea>
-      <button>Save note</button>
+<div id="authView" class="auth">
+  <div class="card">
+    <h1>Secure Notes</h1>
+    <div class="seg"><button id="tabLogin" class="on" type="button">Log in</button><button id="tabRegister" type="button">Register</button></div>
+    <form id="loginForm" class="stack">
+      <label>Email<input name="email" type="email" required autocomplete="username"></label>
+      <label>Password<input name="password" type="password" required autocomplete="current-password"></label>
+      <button class="btn">Log in</button>
     </form>
-    <div class="card">
-      <h2 id="notesTitle">My notes</h2>
-      <input id="noteOwner" class="admin" placeholder="Filter by owner user id (press Enter)">
-      <div id="notesList"></div><button id="notesMore" class="ghost" hidden>Load more</button>
-    </div>
-    <div class="card"><h2>Open one note</h2>
-      <input id="noteById" placeholder="Note id (press Enter)"><div id="noteOne"></div>
-    </div>
-  </section>
-
-  <section id="tab-posts" hidden>
-    <form id="postForm" class="card">
-      <h2>New post</h2>
-      <input name="title" placeholder="Title" required maxlength="200">
-      <textarea name="content" placeholder="Public content"></textarea>
-      <button>Publish post</button>
+    <form id="registerForm" class="stack" hidden>
+      <label>Name<input name="name" required maxlength="100"></label>
+      <label>Email<input name="email" type="email" required autocomplete="username"></label>
+      <label>Password (8-72 characters)<input name="password" type="password" minlength="8" maxlength="72" required autocomplete="new-password"></label>
+      <label>Interests (comma separated, optional)<input name="interests" placeholder="chess, reading"></label>
+      <button class="btn">Create account</button>
     </form>
-    <div class="card">
-      <h2>Posts</h2>
-      <div class="row">
-        <select id="postMode"><option value="all">All posts</option><option value="user">Posts of one user</option></select>
-        <input id="postUser" placeholder="User id (press Enter)" hidden>
-      </div>
-      <div id="postsList"></div><button id="postsMore" class="ghost" hidden>Load more</button>
-    </div>
-    <div class="card"><h2>Open one post</h2>
-      <input id="postById" placeholder="Post id (press Enter)"><div id="postOne"></div>
-    </div>
-  </section>
-
-  <section id="tab-users" class="admin" hidden>
-    <form id="userForm" class="card">
-      <h2>Add user</h2>
-      <div class="row"><input name="name" placeholder="Name" required><input name="email" type="email" placeholder="Email" required></div>
-      <div class="row"><input name="password" type="password" placeholder="Password" minlength="8" maxlength="72" required autocomplete="new-password">
-        <select name="role"><option value="user">user</option><option value="admin">admin</option></select></div>
-      <input name="interests" placeholder="Interests, comma separated">
-      <button>Add user</button>
-    </form>
-    <div class="card"><h2>All users</h2><div id="usersList"></div><button id="usersMore" class="ghost" hidden>Load more</button></div>
-    <div class="card"><h2>Open one user</h2>
-      <input id="userById" placeholder="User id (press Enter)"><div id="userOne"></div>
-    </div>
-  </section>
-
-  <section id="tab-interests" class="admin" hidden>
-    <div class="card">
-      <h2>Users grouped by interest</h2>
-      <input id="interestFilter" placeholder="Show one interest only, e.g. chess (press Enter)">
-      <div id="interestsList"></div><button id="interestsMore" class="ghost" hidden>Load more</button>
-    </div>
-  </section>
-
-  <section id="tab-profile" hidden>
-    <div class="card"><h2>My profile</h2><p id="profileInfo" class="mute"></p>
-      <form id="profileForm"><input name="name" placeholder="Name"><input name="interests" placeholder="Interests, comma separated"><button>Update profile</button></form>
-    </div>
-    <form id="pwForm" class="card"><h2>Change password</h2>
-      <input name="oldPassword" type="password" placeholder="Current password" required autocomplete="current-password">
-      <input name="newPassword" type="password" placeholder="New password (8-72 characters)" minlength="8" maxlength="72" required autocomplete="new-password">
-      <button>Change password</button>
-    </form>
-  </section>
+  </div>
 </div>
-</main>
-<div id="toast" role="status"></div>
+
+<div id="appView" hidden>
+  <header class="top"><div class="top-in">
+    <div class="logo"><i></i>Secure Notes</div><div class="grow"></div>
+    <span id="who" class="who"></span><button id="logout" class="btn sm" type="button">Log out</button>
+    <nav id="tabs" class="tabs">
+      <button data-tab="notes" type="button">Notes</button>
+      <button data-tab="posts" type="button">Posts</button>
+      <button data-tab="users" type="button" class="admin-only">Users</button>
+      <button data-tab="interests" type="button" class="admin-only">Interests</button>
+      <button data-tab="profile" type="button">Profile</button>
+    </nav>
+  </div></header>
+
+  <div class="wrap">
+    <section id="tab-notes" hidden>
+      <form id="noteForm" class="card stack">
+        <h2>New note</h2>
+        <label>Title<input name="title" required maxlength="200"></label>
+        <label>Content<textarea name="content" maxlength="20000"></textarea></label>
+        <button class="btn">Save note</button>
+      </form>
+      <div class="card c2">
+        <h2 id="notesTitle">My notes</h2>
+        <div id="noteFilterInfo" class="bar mute small" hidden></div>
+        <div id="notesList"></div><div id="notesStatus" class="empty" hidden></div>
+        <button id="notesMore" class="btn ghost more" type="button" hidden>Load more</button>
+      </div>
+    </section>
+
+    <section id="tab-posts" hidden>
+      <form id="postForm" class="card stack">
+        <h2>New post <span class="mute small">(public)</span></h2>
+        <label>Title<input name="title" required maxlength="200"></label>
+        <label>Content<textarea name="content" maxlength="20000"></textarea></label>
+        <button class="btn">Publish</button>
+      </form>
+      <div class="card c2">
+        <h2>Posts</h2>
+        <div id="postUserInfo" class="bar mute small" hidden></div>
+        <div id="postsList"></div><div id="postsStatus" class="empty" hidden></div>
+        <button id="postsMore" class="btn ghost more" type="button" hidden>Load more</button>
+      </div>
+    </section>
+
+    <section id="tab-users" hidden>
+      <details class="card"><summary>Add user</summary>
+        <form id="userForm" class="stack">
+          <div class="row"><label>Name<input name="name" required maxlength="100"></label><label>Email<input name="email" type="email" required></label></div>
+          <div class="row"><label>Password<input name="password" type="password" minlength="8" maxlength="72" required autocomplete="new-password"></label>
+            <label>Role<select name="role"><option value="user">user</option><option value="admin">admin</option></select></label></div>
+          <label>Interests (comma separated)<input name="interests"></label>
+          <button class="btn">Add user</button>
+        </form></details>
+      <div class="card c2"><h2>All users</h2><div id="usersList"></div><div id="usersStatus" class="empty" hidden></div>
+        <button id="usersMore" class="btn ghost more" type="button" hidden>Load more</button></div>
+    </section>
+
+    <section id="tab-interests" hidden>
+      <div class="card c4"><h2>Users grouped by interest</h2><div class="mute small" style="margin-bottom:8px">Tap a name to see that user's posts.</div>
+        <div class="bar"><input id="interestFilter" placeholder="Only this interest, e.g. chess"><button id="interestGo" class="btn ghost sm" type="button">Filter</button><button id="interestClear" class="btn ghost sm" type="button">Clear</button></div>
+        <div id="interestsList"></div><div id="interestsStatus" class="empty" hidden></div>
+        <button id="interestsMore" class="btn ghost more" type="button" hidden>Load more</button></div>
+    </section>
+
+    <section id="tab-profile" hidden>
+      <form id="profileForm" class="card stack"><h2>My profile</h2><div id="profileInfo"></div>
+        <label>Name<input name="name" required maxlength="100"></label>
+        <label>Interests (comma separated)<input name="interests"></label>
+        <button class="btn">Update profile</button></form>
+      <form id="pwForm" class="card c3 stack"><h2>Change password</h2>
+        <label>Current password<input name="oldPassword" type="password" required autocomplete="current-password"></label>
+        <label>New password (8-72 characters)<input name="newPassword" type="password" minlength="8" maxlength="72" required autocomplete="new-password"></label>
+        <button class="btn">Change password</button></form>
+    </section>
+  </div>
+</div>
+
+<div class="wrap"><details id="dbg" class="card c4"><summary id="dbgSum">Last API response</summary><pre id="dbgPre">Nothing sent yet.</pre></details></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script>
-// Backend address. Change it if your API runs somewhere else.
+"use strict";
+/* Backend address: must end with /api/v1. The backend's CLIENT_URLS must contain this page's
+   exact origin (e.g. http://YOUR-IP:8080), otherwise the browser blocks the calls. */
 const API = "http://187.126.14.173:6001/api/v1";
 
 const $ = (id) => document.getElementById(id);
-const h = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
+const h = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); kids.flat().forEach((k) => k != null && k !== false && e.append(k)); return e; };
 const csv = (s) => (s || "").split(",").map((x) => x.trim()).filter(Boolean);
-let token = localStorage.getItem("token");
-let me = JSON.parse(localStorage.getItem("me") || "null");
+const when = (d) => new Date(d).toLocaleString();
+const hue = (s) => { let n = 0; for (const c of String(s)) n = (n * 31 + c.charCodeAt(0)) % 360; return n; };
+const safe = { get: (k) => { try { return localStorage.getItem(k); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* ignore */ } }, clear: () => { try { localStorage.clear(); } catch { /* ignore */ } } };
+let token = safe.get("token");
+let me = (() => { try { return JSON.parse(safe.get("me") || "null"); } catch { return null; } })();
 
-function toast(msg, bad) {
-  const t = $("toast"); t.textContent = msg; t.className = "show" + (bad ? " bad" : "");
-  clearTimeout(toast.t); toast.t = setTimeout(() => (t.className = ""), 3500);
+function toast(msg, type) {
+  const t = $("toast"); t.textContent = msg; t.className = "show " + (type || "");
+  clearTimeout(toast.t); toast.t = setTimeout(() => (t.className = ""), 3800);
 }
-const guard = (fn) => async (...a) => {
-  try { await fn(...a); }
-  catch (e) { toast(e.message === "Failed to fetch" ? "Cannot reach the API. Start the server and set CLIENT_URLS to this page's address." : e.message, true); }
-};
+const guard = (fn) => async (...a) => { try { await fn(...a); } catch (e) { toast(e.message, "bad"); } };
+
+/* ---------- last response viewer ---------- */
+const mask = (k, v) => (/password/i.test(k) ? "••••" : k === "accessToken" && typeof v === "string" ? v.slice(0, 12) + "…" : v);
+function record(method, path, body, status, res) {
+  $("dbgSum").textContent = method + " " + path.split("?")[0] + " → " + (status || "network error");
+  $("dbgSum").className = status >= 200 && status < 300 ? "ok" : "bad";
+  $("dbgPre").textContent = JSON.stringify({ query: path.includes("?") ? path.split("?")[1] : undefined, request: body, response: res }, mask, 2).slice(0, 6000);
+}
 async function api(method, path, body) {
-  const res = await fetch(API + path, {
-    method,
-    headers: { "Content-Type": "application/json", ...(token ? { Authorization: "Bearer " + token } : {}) },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let res;
+  try {
+    res = await fetch(API + path, {
+      method,
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: "Bearer " + token } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    record(method, path, body, 0, { error: "Cannot reach " + API });
+    throw new Error("Cannot reach the API at " + API + ". Check the server is running and its CLIENT_URLS includes " + location.origin);
+  }
   const j = await res.json().catch(() => ({}));
+  record(method, path, body, res.status, j);
   if (!res.ok) {
     if (res.status === 401 && token && !path.startsWith("/auth/login")) logout();
-    const d = (j.errorSources || []).map((e) => e.path + ": " + e.message).join("; ");
-    throw new Error((j.message || "Request failed") + (d ? " (" + d + ")" : ""));
+    const d = (j.errorSources || []).map((e) => (e.path ? e.path + ": " : "") + e.message).join("; ");
+    throw new Error((j.message || "Request failed (" + res.status + ")") + (d ? " (" + d + ")" : ""));
   }
   return j;
 }
 
-// ---- session ----
-function setSession(t, user) {
-  token = t; if (user) me = user;
-  localStorage.setItem("token", token); localStorage.setItem("me", JSON.stringify(me));
-  render();
+/* ---------- modal dialog (replaces prompt/confirm) ---------- */
+function ask({ title, message, fields = [], ok = "Save", danger = false }) {
+  return new Promise((resolve) => {
+    let result = null;
+    const dlg = h("dialog");
+    const form = h("form", { className: "stack" }, h("h2", { textContent: title, style: "margin:0" }));
+    if (message) form.append(h("p", { className: "mute", style: "margin:0", textContent: message }));
+    fields.forEach((f) => {
+      const input = f.type === "textarea" ? h("textarea")
+        : f.type === "select" ? h("select", {}, f.options.map((o) => h("option", { value: o, textContent: o, selected: o === f.value })))
+        : h("input", { type: f.type || "text" });
+      input.name = f.name; input.required = !!f.required;
+      if (f.type !== "select") input.value = f.value == null ? "" : f.value;
+      ["maxLength", "minLength", "placeholder", "autocomplete"].forEach((k) => { if (f[k] != null) input[k] = f[k]; });
+      form.append(h("label", {}, f.label, input));
+    });
+    form.append(h("div", { className: "dlg-actions" },
+      h("button", { type: "button", className: "btn ghost", textContent: "Cancel", onclick: () => dlg.close() }),
+      h("button", { className: "btn" + (danger ? " danger" : ""), textContent: ok })));
+    form.onsubmit = (e) => { e.preventDefault(); result = Object.fromEntries(new FormData(form)); dlg.close(); };
+    dlg.append(form); document.body.append(dlg);
+    dlg.addEventListener("close", () => { dlg.remove(); resolve(result); });
+    dlg.showModal();
+    const first = form.querySelector("input,textarea,select"); if (first) first.focus();
+  });
 }
-function logout() { token = me = null; localStorage.clear(); render(); }
-function render() {
-  const on = !!token && !!me;
-  $("authView").hidden = on; $("appView").hidden = !on; $("logout").hidden = !on;
-  $("who").textContent = on ? me.name + " (" + me.role + ")" : "";
-  document.querySelectorAll(".admin").forEach((el) => { if (el.tagName !== "SECTION") el.hidden = !(on && me.role === "admin"); });
-  $("notesTitle").textContent = on && me.role === "admin" ? "All notes" : "My notes";
-  if (on) show("notes");
+const confirmBox = (message) => ask({ title: "Are you sure?", message, ok: "Delete", danger: true });
+
+/* ---------- UI builders ---------- */
+const act = (label, fn, cls = "") => h("button", { type: "button", className: "btn ghost sm " + cls, textContent: label, onclick: guard(fn) });
+const chips = (arr) => (arr || []).map((x) => h("span", { className: "chip", style: "--h:" + hue(x), textContent: x }));
+const av = (name) => h("div", { className: "av", style: "--h:" + hue(name), textContent: (String(name || "?").trim()[0] || "?").toUpperCase() });
+const copyId = (id) => h("button", { type: "button", className: "linkbtn", title: "Copy id", textContent: id, onclick: () => { if (navigator.clipboard) navigator.clipboard.writeText(id).then(() => toast("Id copied", "ok")); } });
+function item({ name, title, badge, meta, text, tags, extra, actions }) {
+  return h("div", { className: "item" }, name ? av(name) : null,
+    h("div", { className: "ib" },
+      h("div", { className: "t" }, title, badge ? h("span", { className: "badge " + badge, textContent: badge }) : null),
+      meta ? h("div", { className: "m" }, meta) : null,
+      text ? h("div", { className: "b", textContent: text }) : null,
+      tags && tags.length ? h("div", {}, chips(tags)) : null,
+      extra && extra.length ? h("div", {}, extra) : null,
+      actions && actions.length ? h("div", { className: "acts" }, actions) : null));
 }
-$("logout").onclick = logout;
-$("tabLogin").onclick = () => { $("loginForm").hidden = false; $("registerForm").hidden = true; $("tabLogin").className = "on"; $("tabRegister").className = ""; };
-$("tabRegister").onclick = () => { $("loginForm").hidden = true; $("registerForm").hidden = false; $("tabLogin").className = ""; $("tabRegister").className = "on"; };
 
-const onForm = (id, fn) => { $(id).onsubmit = guard(async (e) => { e.preventDefault(); await fn(Object.fromEntries(new FormData(e.target))); }); };
-const btn = (label, fn, cls) => h("button", { textContent: label, className: "ghost " + (cls || ""), onclick: guard(fn) });
-const item = (title, meta, text, acts = []) =>
-  h("div", { className: "item" }, h("b", { textContent: title }), h("div", { className: "mute", textContent: meta }),
-    ...(text ? [h("p", { textContent: text })] : []), h("div", { className: "acts" }, ...acts));
-
-// keyset pagination: pass ?cursor=<meta.nextCursor> to get the next page
-function pager(list, more, url, items, row) {
-  let cursor = null;
+/* keyset pagination: GET ...?limit=5&cursor=<meta.nextCursor> */
+function pager({ list, status, more, url, rows, render, empty = "Nothing here yet." }) {
+  let cursor = null, run = 0;
   const load = guard(async (reset) => {
     if (reset) { cursor = null; list.replaceChildren(); }
-    const u = url();
-    const r = await api("GET", u + (u.includes("?") ? "&" : "?") + "limit=5" + (cursor ? "&cursor=" + encodeURIComponent(cursor) : ""));
-    const rows = items(r);
-    if (!rows.length && !cursor) list.append(h("p", { className: "mute", textContent: "Nothing here yet." }));
-    rows.forEach((x) => list.append(row(x)));
-    cursor = r.meta.nextCursor; more.hidden = !r.meta.hasMore;
+    const my = ++run; more.disabled = true; status.hidden = false; status.textContent = "Loading…";
+    try {
+      const u = url();
+      const r = await api("GET", u + (u.includes("?") ? "&" : "?") + "limit=5" + (cursor ? "&cursor=" + encodeURIComponent(cursor) : ""));
+      if (my !== run) return;
+      rows(r).forEach((x) => list.append(render(x)));
+      cursor = r.meta.nextCursor; more.hidden = !r.meta.hasMore;
+      status.hidden = list.children.length > 0; status.textContent = empty;
+    } catch (e) {
+      if (my === run) { status.hidden = false; status.textContent = "Could not load."; more.hidden = true; }
+      throw e;
+    } finally { more.disabled = false; }
   });
   more.onclick = () => load(false);
   return { reset: () => load(true) };
 }
-const onEnter = (id, fn) => { $(id).onkeydown = (e) => { if (e.key === "Enter") fn(); }; };
+const onEnter = (id, fn) => $(id).addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); fn(); } });
+const onForm = (id, fn) => { $(id).onsubmit = async (e) => { e.preventDefault(); const form = e.target; const b = form.querySelector("button"); b.disabled = true; try { await fn(Object.fromEntries(new FormData(form)), form); } catch (err) { toast(err.message, "bad"); } finally { b.disabled = false; } }; };
 
-// ---- auth ----
-onForm("loginForm", async (f) => { const r = await api("POST", "/auth/login", f); setSession(r.data.accessToken, r.data.user); });
-onForm("registerForm", async (f) => { f.interests = csv(f.interests); const r = await api("POST", "/auth/register", f); setSession(r.data.accessToken, r.data.user); });
-
-// ---- notes ----
-const notes = pager($("notesList"), $("notesMore"),
-  () => "/notes" + ($("noteOwner").value.trim() ? "?owner=" + encodeURIComponent($("noteOwner").value.trim()) : ""),
-  (r) => r.data,
-  (n) => {
-    const owner = n.owner && n.owner._id ? n.owner : { _id: n.owner };
-    const acts = owner._id === me._id ? [
-      btn("Edit", async () => {
-        const title = prompt("Title", n.title); if (title === null) return;
-        const content = prompt("Content", n.content); if (content === null) return;
-        await api("PATCH", "/notes/" + n._id, { title, content }); toast("Note saved"); notes.reset();
-      }),
-      btn("Delete", async () => { if (confirm("Delete this note?")) { await api("DELETE", "/notes/" + n._id); toast("Note deleted"); notes.reset(); } }, "danger"),
-    ] : [];
-    return item(n.title, (owner.name ? "by " + owner.name + " · " : "") + new Date(n.createdAt).toLocaleString(), n.content, acts);
-  });
-onForm("noteForm", async (f) => { await api("POST", "/notes", f); $("noteForm").reset(); toast("Note saved"); notes.reset(); });
-onEnter("noteOwner", () => notes.reset());
-
-// ---- posts ----
-const posts = pager($("postsList"), $("postsMore"),
-  () => ($("postMode").value === "user" ? "/posts/user/" + encodeURIComponent($("postUser").value.trim()) : "/posts"),
-  (r) => (Array.isArray(r.data) ? r.data : r.data.posts),
-  (p) => item(p.title, new Date(p.createdAt).toLocaleString() + " · author " + p.author, p.content,
-    p.author === me._id ? [
-      btn("Edit", async () => {
-        const title = prompt("Title", p.title); if (title === null) return;
-        const content = prompt("Content", p.content); if (content === null) return;
-        await api("PATCH", "/posts/" + p._id, { title, content }); toast("Post saved"); posts.reset();
-      }),
-      btn("Delete", async () => { if (confirm("Delete this post?")) { await api("DELETE", "/posts/" + p._id); toast("Post deleted"); posts.reset(); } }, "danger"),
-    ] : []));
-onForm("postForm", async (f) => { await api("POST", "/posts", f); $("postForm").reset(); toast("Post published"); posts.reset(); });
-$("postMode").onchange = () => { const u = $("postMode").value === "user"; $("postUser").hidden = !u; if (!u) posts.reset(); };
-onEnter("postUser", () => posts.reset());
-
-// ---- users (admin) ----
-const users = pager($("usersList"), $("usersMore"), () => "/users", (r) => r.data,
-  (u) => item(u.name, u.email + " · " + u.role + " · [" + (u.interests || []).join(", ") + "] · id " + u._id, "", [
-    btn("Edit", async () => {
-      const name = prompt("Name", u.name); if (name === null) return;
-      const role = prompt("Role (user or admin)", u.role); if (role === null) return;
-      const interests = prompt("Interests, comma separated", (u.interests || []).join(", ")); if (interests === null) return;
-      await api("PATCH", "/users/" + u._id, { name, role, interests: csv(interests) }); toast("User saved"); users.reset();
-    }),
-    btn("Delete", async () => { if (confirm("Delete this user and all their notes and posts?")) { await api("DELETE", "/users/" + u._id); toast("User deleted"); users.reset(); } }, "danger"),
-  ]));
-onForm("userForm", async (f) => { f.interests = csv(f.interests); await api("POST", "/users", f); $("userForm").reset(); toast("User added"); users.reset(); });
-
-// ---- interests (admin) ----
-const interests = pager($("interestsList"), $("interestsMore"),
-  () => "/users/interests" + ($("interestFilter").value.trim() ? "?interest=" + encodeURIComponent($("interestFilter").value.trim()) : ""),
-  (r) => r.data,
-  (g) => item(g.interest + " (" + g.count + ")", "", g.users.map((u) => u.name + " <" + u.email + ">").join(", ")));
-onEnter("interestFilter", () => interests.reset());
-
-// ---- open one item by id (GET /notes/:id, /posts/:id, /users/:id) ----
-const one = (inputId, outId, path, fmt) => onEnter(inputId, guard(async () => {
-  const r = await api("GET", path + encodeURIComponent($(inputId).value.trim()));
-  $(outId).replaceChildren(fmt(r.data));
-}));
-one("noteById", "noteOne", "/notes/", (n) => item(n.title, new Date(n.createdAt).toLocaleString() + " · owner " + n.owner, n.content));
-one("postById", "postOne", "/posts/", (p) => item(p.title, new Date(p.createdAt).toLocaleString() + " · author " + p.author, p.content));
-one("userById", "userOne", "/users/", (u) => item(u.name, u.email + " · " + u.role + " · [" + (u.interests || []).join(", ") + "]", ""));
-
-// ---- profile ----
-const loadProfile = guard(async () => {
-  const r = (await api("GET", "/users/me")).data;
-  $("profileInfo").textContent = r.email + " · " + r.role + " · interests: " + (r.interests || []).join(", ");
-  $("profileForm").elements.name.value = r.name; $("profileForm").elements.interests.value = (r.interests || []).join(", ");
-});
-onForm("profileForm", async (f) => {
-  const r = await api("PATCH", "/users/me", { name: f.name, interests: csv(f.interests) });
-  me.name = r.data.name; localStorage.setItem("me", JSON.stringify(me)); $("who").textContent = me.name + " (" + me.role + ")";
-  toast("Profile saved"); loadProfile();
-});
-onForm("pwForm", async (f) => { const r = await api("PATCH", "/auth/change-password", f); setSession(r.data.accessToken); $("pwForm").reset(); toast("Password changed"); });
-
-// ---- tabs ----
-const loaders = { notes: () => notes.reset(), posts: () => posts.reset(), users: () => users.reset(), interests: () => interests.reset(), profile: loadProfile };
-function show(name) {
-  document.querySelectorAll("#tabs button").forEach((b) => b.classList.toggle("on", b.dataset.tab === name));
-  ["notes", "posts", "users", "interests", "profile"].forEach((t) => ($("tab-" + t).hidden = t !== name));
-  loaders[name]();
+/* ---------- session ---------- */
+function setSession(t, user) { token = t; if (user) me = user; safe.set("token", token); safe.set("me", JSON.stringify(me)); render(); }
+function logout() { token = null; me = null; noteFilter = null; postUser = null; safe.clear(); render(); }
+function render() {
+  const on = !!token && !!me;
+  $("authView").hidden = on; $("appView").hidden = !on;
+  document.body.dataset.role = on ? me.role : "";
+  $("who").textContent = on ? me.name + " · " + me.role : "";
+  $("notesTitle").textContent = on && me.role === "admin" ? "All notes" : "My notes";
+  if (on) show("notes");
 }
-document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => show(b.dataset.tab)));
-
-render();
-</script>
-</body>
-</html>
+$("logout").onclick = logout;
+const authTab = (login) => { $("loginForm").hidden = !login; $("registerForm").hidden = login; $("tabLogin").classList.toggle("on", login); $("tabRegister").classList.toggle("on", !login); };
+$("tabLogin").onclick = () => authTab(true); $("tabRegister").onclick = () => authTab(false);
+onForm("logi
